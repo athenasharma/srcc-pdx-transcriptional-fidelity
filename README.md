@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/32600466/README.md)
 # Transcriptional Fidelity of Patient-Derived Xenograft Models in Colorectal Signet-Ring Cell Carcinoma
 
 Independent exploratory re-analysis of publicly available bulk RNA-sequencing data from **GSE279979**.
