@@ -1,116 +1,58 @@
-# Transcriptional Fidelity of Patient-Derived Xenograft Models in Colorectal Signet-Ring Cell Carcinoma
+# Transcriptional comparison of colorectal SRCC tumours and PDX samples
 
-Independent exploratory re-analysis of publicly available bulk RNA-sequencing data from **GSE279979**.
+An independent computational reanalysis of **GSE279979**, comparing primary colorectal signet-ring cell carcinoma (SRCC), patient-derived xenografts (PDX), and adjacent normal tissue. The six deposited samples show strong concordance of tumour-associated expression changes and pathway enrichment.
 
-## Question
+## Findings
 
-How faithfully do colorectal signet-ring cell carcinoma (SRCC) patient-derived xenograft (PDX) models preserve the transcriptional state and biological programmes of the primary human tumour?
+The complete public-count-table rerun retained 23,796 genes and reproduced the gene-effect result:
 
-## Dataset
+| Measurement | Result |
+| --- | --- |
+| Tumour–normal versus PDX–normal gene-effect concordance | Spearman r = **0.96434** |
+| Hallmark enrichment-score concordance | Spearman r = **0.99760** |
+| Jointly significant Hallmark sets, with matching enrichment direction | **35** at FDR < 0.05 in both contrasts |
+| PDX similarity to primary-tumour expression centroid | Spearman r = **0.98684** and **0.98669** |
+| Median absolute direct PDX–tumour expression difference | **0.08383** mean log2(CPM+1) units |
 
-The public dataset contains:
+![Gene-effect concordance](verified_gene_concordance.png)
 
-- 2 adjacent-normal samples
-- 2 primary SRCC tumour samples
-- 2 SRCC PDX samples
+![Pathway-score concordance](verified_pathway_concordance.png)
 
-Because of the very small cohort, this analysis is descriptive and hypothesis-generating rather than a definitive validation study.
+The direct PDX–tumour comparison yielded no Hallmark set below FDR 0.05. Together, these analyses describe substantial transcriptional similarity in the deposited samples. They do not establish equivalence or predict therapeutic response. Shared-normal contrasts can inflate concordance, so the direct contrast is reported alongside them.
 
-## Analysis
+## Data and analysis
 
-The workflow included:
+[NCBI GEO GSE279979](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE279979) contains two normal samples, two primary tumours and two PDX samples. See [sample_manifest.csv](sample_manifest.csv) for the accession mapping. Sample-name suffixes are not treated as proof of independent matched donors.
 
-- library-size normalization and log-expression transformation
-- PCA and transcriptome-wide sample correlation
-- primary-tumour and PDX similarity to the normal/tumour centroids
-- comparison of tumour-associated gene-expression changes with PDX-associated changes
-- Hallmark gene-set enrichment analysis
-- direct PDX-versus-primary-tumour pathway analysis
-- exploratory Reactome/GO analysis of autophagy-related programmes
+The workflow downloads the deposited count table, verifies its SHA256, checks counts and sample columns, retains genes with at least 10 counts in at least two samples, and computes log2(CPM+1). It exports PCA, sample correlations, expression contrasts, Hallmark enrichments and the direct PDX–tumour contrast. Duplicate Ensembl IDs are checked after filtering; none remain in the retained table.
 
-## Key results
+Hallmark GSEA uses ranked mean-expression differences, 1,000 gene-set permutations and seed 42. Ensembl-to-symbol mapping comes from MyGene.info. Where multiple IDs map to one symbol, the largest absolute tumour–normal effect is retained, matching the original final ranking rule. This rule and gene-set permutation inference are explicit analysis choices; they do not supply population-level evidence from two samples per group. A significance threshold difference between contrasts is not called an acquired or lost pathway.
 
-### Global tumour identity is retained
+## Reproduce
 
-Both PDX samples showed stronger transcriptome-wide similarity to the primary-tumour centroid:
+Tested with Python 3.12.14 and the pinned package versions below.
 
-- PDX 1 → tumour: **r = 0.987**
-- PDX 2 → tumour: **r = 0.987**
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python analysis.py --data-dir data --output-dir results/recomputed
+```
 
-compared with similarity to adjacent normal tissue (~0.89).
+`analysis.py` runs from downloaded inputs through exported results. The notebook displays the checked snapshot and contains an optional full-run cell. Its preview mode does not repeat the raw-data analysis.
 
-### Tumour-associated expression changes are strongly preserved
+- [Analysis code](analysis.py) and [download/GSEA helpers](common.py)
+- [Checked summary](verified_results.json), [input and annotation provenance](provenance.json), [recomputed Hallmark comparison](verified_Hallmark_comparison.csv)
+- [Notebook](SRCC_PDX_Transcriptional_Fidelity_Analysis.ipynb)
 
-Gene-expression changes observed in primary tumour relative to normal tissue were strongly concordant with those observed in PDX:
+Raw data and annotation caches remain local in `data/`. Source-data and annotation resources retain their providers' terms. The run records checksums for the downloaded counts, symbol mapping and gene-set library. Live annotation services can change, so compare these checksums between runs. GSEA rank ties also make exact enrichment scores sensitive to software and ordering.
 
-**Spearman r = 0.964**
+## Historical exports
 
-![Gene-effect fidelity](SRCC_gene_effect_fidelity.png)
+Files beginning `SRCC_` other than the notebook are preserved original exports. The original notebook is retained in Git history at commit `1cab07744cf801afa8ad420272aad61260e54d52`. They document the earlier analysis; `verified_*` files and the current code describe the checked rerun. The original pathway-score correlation was 0.99750; the rerun is 0.99760, with the same 35 jointly significant, same-direction sets and no direct Hallmark FDR hits. The gene-effect correlation and retained gene count reproduce exactly.
 
-### Tumour-associated biological programmes are preserved
+The historical Reactome autophagy export is an exploratory extension and is not part of the current Hallmark reproduction workflow. It is not evidence of validated autophagy activation.
 
-Pathway-level Hallmark enrichment showed near-identical tumour and PDX effects:
+## Contribution
 
-**Spearman r = 0.998**
-
-Thirty-five significant tumour-associated Hallmark programmes were preserved in PDX.
-
-No significant PDX-acquired Hallmark programme was detected.
-
-![Pathway fidelity](SRCC_pathway_fidelity.png)
-
-Preserved programmes included:
-
-- TNF-alpha / NF-kB signalling
-- epithelial–mesenchymal transition
-- inflammatory response
-- mTORC1 signalling
-- E2F targets
-- angiogenesis
-- hypoxia
-- KRAS signalling
-- MYC targets
-- IL-6/JAK/STAT3 signalling
-- glycolysis
-- reactive oxygen species response
-- p53 signalling
-- TGF-beta signalling
-
-## Direct PDX vs primary-tumour comparison
-
-A direct comparison was performed to avoid relying only on two contrasts sharing the same normal reference.
-
-Results:
-
-- **0 significant Hallmark pathways** at FDR < 0.05
-- median absolute PDX-vs-tumour expression difference: **0.084 log2(CPM+1)**
-- only **8 genes** had an absolute difference >1
-
-These results suggest limited large-scale pathway-level transcriptional remodeling in the PDX samples relative to the primary tumours.
-
-## Autophagy-related biology
-
-Reactome autophagy-related programmes showed similar positive enrichment in primary tumour and PDX.
-
-However, broad autophagy gene sets did not reach FDR < 0.05 in this small cohort, so this should be interpreted as directional concordance rather than independent evidence of significant autophagy activation.
-
-## Interpretation
-
-Within the limitations of the available dataset, SRCC PDX models appear to retain much of the dominant primary-tumour transcriptional state and pathway-level biology.
-
-This supports their use as mechanistic and therapeutic models while emphasizing that transcriptomic fidelity alone does not establish preservation of spatial, stromal, immune or functional tumour properties.
-
-## Limitations
-
-- only two samples per group
-- exploratory re-analysis of public data
-- PDX models derive directly from tumours, so high similarity is partly expected
-- bulk RNA-seq cannot resolve cell-type composition or spatial biology
-- shared-normal comparisons can inflate apparent concordance
-- transcriptomic similarity does not establish therapeutic validity
-
-## Data source
-
-Public RNA-seq data: **NCBI GEO GSE279979**
-
-No new patient samples were generated as part of this project.
+Athena Sharma conducted this computational reanalysis of public data. Original data generation belongs to the GSE279979 study team. This project is an exploratory research portfolio analysis.

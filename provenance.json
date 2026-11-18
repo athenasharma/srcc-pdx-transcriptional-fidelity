@@ -1,0 +1,25 @@
+{
+  "source": {
+    "file": "GSE279979_raw_counts.txt.gz",
+    "url": "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE279nnn/GSE279979/suppl/GSE279979_raw_counts.txt.gz",
+    "sha256": "686a7f6304a7294474e5e6f208cddba7e241d8549adc44ed7f99d120847aedc5",
+    "bytes": 5702452
+  },
+  "symbol_mapping_sha256": "4abdc674aab55a422e6eda3969b067eb63a15ed8a958bb3fb27244f216fce290",
+  "gene_sets": {
+    "library": "MSigDB_Hallmark_2020",
+    "sha256": "ad429f1f1b76730c707d2b05456ffcc9347163e2a1dc940a0615cdf406161df8",
+    "provider": "Enrichr via GSEApy",
+    "source": "https://maayanlab.cloud/Enrichr/"
+  },
+  "versions": {
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "gseapy": "1.3.2",
+    "mygene": "3.2.2",
+    "matplotlib": "3.11.2"
+  },
+  "method": "Library-size normalized counts; mean log2(CPM+1) contrasts; 1000 gene-set permutations, seed 42."
+}

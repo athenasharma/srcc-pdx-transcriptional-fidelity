@@ -1,0 +1,21 @@
+{
+  "n_samples": 6,
+  "retained_genes": 23796,
+  "gene_effect_spearman": 0.9643398713279617,
+  "pathway_NES_spearman": 0.9975990396158463,
+  "jointly_significant_same_direction": 35,
+  "direct_Hallmark_FDR_hits": 0,
+  "median_absolute_direct_difference": 0.08383341157436508,
+  "direct_difference_gt1": 8,
+  "centroid_correlations": {
+    "UT_1": {
+      "tumour": 0.9868448440499052,
+      "normal": 0.8885971880339543
+    },
+    "UT_2": {
+      "tumour": 0.9866856519616265,
+      "normal": 0.8908658203339216
+    }
+  },
+  "inference": "Descriptive sample-level comparison; GSEA uses gene-set permutations, not a population-level model-fidelity test."
+}
